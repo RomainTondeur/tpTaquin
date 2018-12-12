@@ -7,16 +7,13 @@ import math
 import copy
 from random import randint
 import time
-###############################################################################
-# VARIABLES GLOBALES                                                          #
-###############################################################################
 
+
+# VARIABLES GLOBALES
 comptNord,comptSud,comptEst,comptOuest = 0,0,0,0
 
-###############################################################################
-# CONSTANTES                                                                  #
-###############################################################################
 
+# CONSTANTES
 POIDS = ((36, 12, 12, 4, 1, 1, 4, 1, 0),    #pi1
         (8, 7, 6, 5, 4, 3, 2, 1, 0),        #pi2 = pi3
         (8, 7, 6, 5, 4, 3, 2, 1, 0),        #pi3 = pi2
@@ -26,10 +23,8 @@ POIDS = ((36, 12, 12, 4, 1, 1, 4, 1, 0),    #pi1
 
 COEFF = (4, 1)  #rho1 à rho6
 
-###############################################################################
-# CLASSES ET METHODES                                                         #
-###############################################################################
 
+# CLASSES ET METHODES
 class Taquin:
     """Liste des attributs
     
@@ -58,21 +53,21 @@ class Taquin:
             print(liste)
 
 
+    # Renvoie True si le taquin est résolu.
     def estSoluce(self):
-        """Renvoie True si le taquin est résolu."""
         return self.etat == Taquin(self.size).etat
 
-    def chercher(self, e):
-        """Retourne les coordonnées de la case e"""
+    # Retourne les coordonnées de la dalle recherchée
+    def chercher(self, dalle):
         for i in range(self.size):
             for j in range(self.size):
-                if self.etat[(i,j)] == e:
+                if self.etat[(i,j)] == dalle:
                     return (i,j)
 
+    # Déplace le case dans l'une des directions Nord, Sud, Est, Ouest et renvoie le taquin résultant avec le chemin et le cout mis à jour.
     def deplacerCase(self, sens):
         global comptOuest,comptEst,comptSud,comptNord
-        """Déplace le case dans l'une des directions Nord, Sud, Est, Ouest,
-        et renvoie le taquin résultant avec le chemin et le cout mis à jour."""
+
         copie_T = copy.deepcopy(self)
         case = self.chercher(len(self.etat) - 1)
         if sens == "N":
@@ -102,9 +97,9 @@ class Taquin:
         copie_T.cout += 1
         return copie_T
 
+
+    # Prend un taquin résolu et le mélange avec un grand nombre de mouvements aléatoires. On est sûr qu'il est résolvable en faisant ça.
     def melanger_taquin(self):
-        """Prend un taquin résolu et le mélange avec un grand nombre de 
-        mouvements aléatoires. On est sûr qu'il est résolvable en faisant ça."""
         case = list(self.chercher(len(self.etat)-1))
 
         for i in range(10000):
@@ -200,15 +195,15 @@ class Taquin:
                     self = self.deplacerCase("O")
                     case[1] -= 1
 
-        # on réinitialise les valeurs car deplacerCase les change
+        # On réinitialise les valeurs car deplacerCase les change
         self.cout = 0
         self.f = 0
         self.chemin = ""
         return self
 
 
+    # Renvoie une liste des états accessibles à partir de l'état actuel.
     def expanser(self):
-        """Renvoie une liste des états accessibles à partir de l'état actuel."""
 
         case = self.chercher(len(self.etat) - 1)
         
@@ -259,55 +254,56 @@ class Taquin:
 
         return [eNord,eSud,eOuest,eEst]
 
-    def dist_elem(self, e):
-        """Renvoie le nombre de cases séparant l'élément e de sa position 
-        voulue. Fonction intermédiaire pour la distance de Manhattan."""
 
+    # Renvoie le nombre de cases séparant l'élément e de sa position voulue. Fonction intermédiaire pour la distance de Manhattan.
+    def dist_elem(self, dalle):
         d = 0
-        posActuelle = self.chercher(e)
-        posDemande = (e // self.size, e % self.size)
-        d = abs(posActuelle[0] - posDemande[0]) \
-                + abs(posActuelle[1] - posDemande[1])
+
+        posActuelle = self.chercher(dalle)
+        posDemande = (dalle // self.size, dalle % self.size)
+        d = abs(posActuelle[0] - posDemande[0]) + abs(posActuelle[1] - posDemande[1])
         return d
 
-    def manhattan(self, k):
-        """Calcule la distance Manhattan avec POIDS[k] et COEFF[k].
-        Fonction intermédiaire pour la fonction d'évaluation f."""
+
+    # Calcule la distance Manhattan avec POIDS[indice] et COEFF[indice].
+    # Fonction intermédiaire pour la fonction d'évaluation f.
+    def manhattan(self, indice):
         elem = [self.dist_elem(i) for i in range(len(self.etat))]
         elem = tuple(elem) 
+
         if self.size < 3:
-            return sum(POIDS[k][i] * elem[i] \
-                    for i in range(len(self.etat))) / COEFF[k%2]
+            return sum(POIDS[indice][i] * elem[i] for i in range(len(self.etat))) / COEFF[indice%2]
         else:
             poids = tuple([len(self.etat)-i-1 for i in range(len(self.etat))])
-            return sum(poids[i] * elem[i] \
-                    for i in range(len(self.etat))) / COEFF[k%2]
-
-    def calculer_f(self, k):
-        return self.cout + self.manhattan(k)
+            return sum(poids[i] * elem[i] for i in range(len(self.etat))) / COEFF[indice%2]
 
 
+    # Fonction de calcul
+    def calculer_f(self, indice):
+        return self.cout + self.manhattan(indice)
+
+
+# Liste d'états triés selon leur valeur de f (ordre croissant).
 class Frontiere:
-    """Liste d'états triés selon leur valeur de f (ordre croissant)."""
     def __init__(self):
         self.etats = []
 
-    def ajouter(self, e):
-        """Ajoute e à la bonne position en fonction de sa valeur de f."""
+    # Ajoute e à la bonne position en fonction de sa valeur de f.
+    def ajouter(self, etat):
         if self.etats == []:
-            self.etats.insert(0,e)
+            self.etats.insert(0,etat)
         else:
             fait = False
             for i in range(len(self.etats)):
-                if self.etats[i].f >= e.f and not fait:
-                    self.etats.insert(i,e)
+                if self.etats[i].f >= etat.f and not fait:
+                    self.etats.insert(i,etat)
                     fait = True
             if not fait:
-                self.etats.insert(len(self.etats),e)
+                self.etats.insert(len(self.etats),etat)
 
 
+# Arbre binaire contenant les états déjà explorés
 class DejaExplores:
-    """Arbre binaire contenant les états déjà explorés"""
     def __init__(self):
         self.etats = []
 
@@ -321,10 +317,7 @@ class DejaExplores:
         return False
         
 
-###############################################################################
-# ALGORITHME A*                                                               #
-###############################################################################
-
+# ALGORITHME A*
 def graph_search():
     # Initialisation =====================================================
     global comptOuest,comptEst,comptSud,comptNord
@@ -369,7 +362,8 @@ def graph_search():
                 if t.chemin != "":
                     t.chemin += " / "
 
-            expansion = t.expanser() #On récupère une liste des états accessibles
+            # On récupère une liste des états accessibles
+            expansion = t.expanser()
             historique.ajouter(t)
             for i in range(len(expansion)):
                 if not expansion[i] == None:
