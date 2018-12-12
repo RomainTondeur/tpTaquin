@@ -10,8 +10,9 @@ import time
 
 
 # VARIABLES GLOBALES
+totalNord,totalSud,totalEst,totalOuest = 0,0,0,0
 comptNord,comptSud,comptEst,comptOuest = 0,0,0,0
-bestNord,bestSuc,bestOuest,bestEst = 0,0,0,0
+bestNord,bestSud,bestOuest,bestEst = 100000,100000,100000,100000
 
 
 # CONSTANTES
@@ -67,7 +68,9 @@ class Taquin:
 
     # Déplace le case dans l'une des directions Nord, Sud, Est, Ouest et renvoie le taquin résultant avec le chemin et le cout mis à jour.
     def deplacerCase(self, sens):
+        global totalOuest,totalEst,totalSud,totalNord
         global comptOuest,comptEst,comptSud,comptNord
+        print("test")
 
         copie_T = copy.deepcopy(self)
         case = self.chercher(len(self.etat) - 1)
@@ -75,21 +78,25 @@ class Taquin:
             copie_T.etat[case] = self.etat[(case[0]-1, case[1])]
             copie_T.etat[(case[0]-1, case[1])] = self.etat[case]
             copie_T.chemin += "N"
+            totalNord += 1
             comptNord += 1
         elif sens == "S":
             copie_T.etat[case] = self.etat[(case[0]+1, case[1])]
             copie_T.etat[(case[0]+1, case[1])] = self.etat[case]
             copie_T.chemin += "S"
+            totalSud += 1
             comptSud += 1
         elif sens == "E":
             copie_T.etat[case] = self.etat[(case[0], case[1]+1)]
             copie_T.etat[(case[0], case[1]+1)] = self.etat[case]
             copie_T.chemin += "E"
+            totalEst += 1
             comptEst += 1
         elif sens == "O":
             copie_T.etat[case] = self.etat[(case[0], case[1]-1)]
             copie_T.etat[(case[0], case[1]-1)] = self.etat[case]
             copie_T.chemin += "O"
+            totalOuest += 1
             comptOuest += 1
         else:
             print("Mouvement non reconnu. Devrait être N, S, E ou O.")
@@ -321,6 +328,8 @@ class DejaExplores:
 # ALGORITHME A*
 def graph_search():
     # Initialisation =====================================================
+    global totalOuest,totalEst,totalSud,totalNord
+    global bestEst,bestOuest,bestSud,bestNord
     global comptOuest,comptEst,comptSud,comptNord
     t0 = Taquin(int(input("Entrer la taille du taquin : ")))
     pond = int(input("Pondération pour les distances de Manhattan (0 à 5) : "))
@@ -353,12 +362,16 @@ def graph_search():
                 print("Solution : " + str(t.chemin))
                 print(str(len(historique.etats)) + " états explorés\n")  
                 """t.afficher()"""
-                print("Nombre total de déplacements vers le Nord : " + str(comptNord) + "\n")
-                print("Nombre total de déplacements vers le Sud : " + str(comptSud) + "\n")
-                print("Nombre total de déplacements vers l'Ouest : " + str(comptOuest) + "\n")
-                print("Nombre total de déplacements vers l'Est : " + str(comptEst) + "\n")
+                print("Nombre total de déplacements vers le Nord : " + str(totalNord) + "\n")
+                print("Nombre total de déplacements vers le Sud : " + str(totalSud) + "\n")
+                print("Nombre total de déplacements vers l'Ouest : " + str(totalOuest) + "\n")
+                print("Nombre total de déplacements vers l'Est : " + str(totalEst) + "\n")
                 print("**************************************************\n")
-                comptNord,comptSud,comptEst,comptOuest = 0,0,0,0
+                print("Nombre de déplacements vers le Nord pour le meilleur test : " + str(bestNord) + "\n")
+                print("Nombre de déplacements vers le Sud pour le meilleur test : " + str(bestSud) + "\n")
+                print("Nombre de déplacements vers l'Est pour le meilleur test : " + str(bestEst) + "\n")
+                print("Nombre de déplacements vers l'Ouest pour le meilleur test : " + str(bestOuest) + "\n")
+                totalNord,totalSud,totalEst,totalOuest = 0,0,0,0
             else:
                 if t.chemin != "":
                     t.chemin += " / "
@@ -371,6 +384,18 @@ def graph_search():
                     expansion[i].f = expansion[i].calculer_f(pond)
                     if not historique.contient(expansion[i]):
                         frontiere.ajouter(expansion[i])
+            if bestNord > comptNord:
+            	bestNord = comptNord
+            if bestEst > comptEst:
+            	bestEst = comptEst
+            if bestSud > comptSud:
+            	bestSud = comptSud
+            if bestOuest > comptOuest:
+            	bestOuest = comptOuest
+            comptSud = 0
+            comptNord = 0
+            comptOuest = 0
+            comptEst = 0
     return 0
 
 graph_search()
