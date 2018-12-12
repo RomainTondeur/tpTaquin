@@ -11,6 +11,7 @@ import time
 
 # VARIABLES GLOBALES
 comptNord,comptSud,comptEst,comptOuest = 0,0,0,0
+bestNord,bestSuc,bestOuest,bestEst = 0,0,0,0
 
 
 # CONSTANTES
@@ -315,14 +316,14 @@ class DejaExplores:
             if e.etat == i.etat:
                 return True
         return False
-        
+
 
 # ALGORITHME A*
 def graph_search():
     # Initialisation =====================================================
     global comptOuest,comptEst,comptSud,comptNord
     t0 = Taquin(int(input("Entrer la taille du taquin : ")))
-    #pond = int(input("Pondération pour les distances de Manhattan (0 à 5) : "))
+    pond = int(input("Pondération pour les distances de Manhattan (0 à 5) : "))
 
     t0 = t0.melanger_taquin() #pour avoir un taquin non résolu
     #print(t0.etat) #affiche le taquin initial
@@ -352,10 +353,10 @@ def graph_search():
                 print("Solution : " + str(t.chemin))
                 print(str(len(historique.etats)) + " états explorés\n")  
                 """t.afficher()"""
-                print("Nombre de déplacement vers le Nord : " + str(comptNord) + "\n")
-                print("Nombre de déplacement vers le Sud : " + str(comptSud) + "\n")
-                print("Nombre de déplacement vers l'Ouest : " + str(comptOuest) + "\n")
-                print("Nombre de déplacement vers l'Est : " + str(comptEst) + "\n")
+                print("Nombre total de déplacements vers le Nord : " + str(comptNord) + "\n")
+                print("Nombre total de déplacements vers le Sud : " + str(comptSud) + "\n")
+                print("Nombre total de déplacements vers l'Ouest : " + str(comptOuest) + "\n")
+                print("Nombre total de déplacements vers l'Est : " + str(comptEst) + "\n")
                 print("**************************************************\n")
                 comptNord,comptSud,comptEst,comptOuest = 0,0,0,0
             else:
