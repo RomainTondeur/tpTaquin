@@ -87,7 +87,6 @@ class Taquin:
     def deplacer(self, direction):
         # On récupère l'accès au variables globales
         global totalGauche, totalDroite, totalBas, totalHaut
-        global comptGauche, comptDroite, comptBas, comptHaut
 
         # On crée une copie du taquin
         copie_taquin = copy.deepcopy(self)
