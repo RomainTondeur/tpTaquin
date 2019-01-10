@@ -418,7 +418,7 @@ def rech_taquin(taquin):
     global bestDroite, bestGauche, bestBas, bestHaut
 
     # On récupère la pondération pour Manhattan
-    ponderation = int(input("\nPondération pour les distances de Manhattan (0 à 5) : "))
+    ponderation = int(input("\nPondération pour les distances de Manhattan (1 à 5) : "))
 
     for pond in range(ponderation):
         print("\n***************** Ponderation : " + str(pond) + " *****************\n")
