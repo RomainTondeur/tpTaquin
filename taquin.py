@@ -327,6 +327,7 @@ class Taquin:
 
         # On calcule la distance
         distance = abs(pos_actuelle[0] - pos_but[0]) + abs(pos_actuelle[1] - pos_but[1])
+        #print("Case: " + str(case) + " Pos actu.: " + str(pos_actuelle) + " Pos but: " + str(pos_but))
 
         return distance
 
@@ -334,7 +335,7 @@ class Taquin:
     def manhattan(self, ponderation):
 
         elem = [self.dist_elem(i) for i in range(len(self.etat))]
-        elem = tuple(elem) 
+        elem = tuple(elem)
 
         if self.size < 3:
             return sum(POIDS[ponderation][i] * elem[i] for i in range(len(self.etat))) / COEFF[ponderation % 2]
@@ -381,20 +382,31 @@ class DejaExplores:
         return False
 
 
+# Retourne le nombre de cases mal positionnées
+def cases_mal_pos(taquin):
+    cases_mp = 0
+    for case in [taquin.dist_elem(i) for i in range(len(taquin.etat))]:
+        if case > 0:
+            cases_mp += 1
+    return cases_mp
+
 # Retourne un taquin initialisé et mélangé
 def init_taquin():
     taquin = Taquin(int(input("Veuillez indiquer la taille du taquin : ")))
 
     # On affiche le taquin but
-    print("\nTaquin but:")
+    print("\nTaquin but :")
     taquin.afficher()
 
     # On mélange le taquin but (résoluble)
     taquin = taquin.melanger_taquin()
 
     # On affiche le taquin initial
-    print("\nTaquin initial:")
+    print("\nTaquin initial :")
     taquin.afficher()
+
+    # Nombre de cases mal positionnées
+    print("\nCases mal positionnées : " + str(cases_mal_pos(taquin)))
 
     return taquin
 
@@ -441,16 +453,18 @@ def rech_taquin(taquin):
 
                 # Si oui, on affiche nos indicateurs
                 print("Recherche terminée en %s secondes" % (time.time() - start_time))
-                print("Solution : " + str(taq.chemin))
-                print("Coût : " + str(taq.cout))
-                print(str(len(historique.taquins)) + " taquins explorés\n")
+                print("\nTaquin atteint :")
+                taq.afficher()
+                print("\nSolution : " + str(taq.chemin))
 
-                print("---------------------------------------------------\n")
+                print("\n---------------------------------------------------\n")
+                print("Coût : " + str(taq.cout) + "\n")
                 print("Nombre de déplacements vers le Haut : " + str(taq.comptHaut) + "\n")
                 print("Nombre de déplacements vers le Bas : " + str(taq.comptBas) + "\n")
                 print("Nombre de déplacements vers la Gauche : " + str(taq.comptGauche) + "\n")
-                print("Nombre de déplacements vers la Droite : " + str(taq.comptDroite) + "\n")
-                print("---------------------------------------------------\n")
+                print("Nombre de déplacements vers la Droite : " + str(taq.comptDroite))
+                print("\n---------------------------------------------------\n")
+                print(str(len(historique.taquins)) + " taquins explorés\n")
                 print("Nombre total de déplacements vers le Haut : " + str(totalHaut) + "\n")
                 print("Nombre total de déplacements vers le Bas : " + str(totalBas) + "\n")
                 print("Nombre total de déplacements vers la Gauche : " + str(totalGauche) + "\n")
